@@ -68,9 +68,31 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.deleteUser = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      "DELETE FROM users WHERE id = $1 RETURNING *",
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ message: "User deleted successfully", user: result.rows[0] });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ error: "Failed to delete user" });
+  }
+};
+
 exports.getAllUsers = async (req, res) => {
   try {
-    const result = await pool.query("SELECT id, full_name, email FROM users");
+    const result = await pool.query(
+      "SELECT id, full_name, email, password FROM users"
+    );
     res.status(200).json(result.rows);
   } catch (err) {
     console.error(err);
