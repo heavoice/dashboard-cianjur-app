@@ -90,9 +90,7 @@ exports.deleteUser = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const result = await pool.query(
-      "SELECT id, full_name, email, password FROM users"
-    );
+    const result = await pool.query("SELECT full_name FROM users");
     res.status(200).json(result.rows);
   } catch (err) {
     console.error(err);

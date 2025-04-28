@@ -1,7 +1,11 @@
+//@ts-check
+
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/user");
 const { initializeDatabase } = require("./config/db");
 
 dotenv.config();
@@ -14,12 +18,12 @@ app.use(express.json());
 
 initializeDatabase();
 
+app.use(express.static(path.join(__dirname, "public")));
 app.use("/api", authRoutes);
+app.use("/api", userRoutes);
 
 app.get("/api", (req, res) => {
   res.send("Server Started!");
 });
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+module.exports = app;
