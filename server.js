@@ -6,7 +6,7 @@ const path = require("path");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
-const { initializeDatabase } = require("./config/db");
+const { initializeDatabase, getSettings } = require("./config/db");
 
 dotenv.config();
 
@@ -22,8 +22,21 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api", authRoutes);
 app.use("/api", userRoutes);
 
+app.get("api/settings", async (req, res) => {
+  try {
+    const settings = await getSettings();
+    res.json(settings);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch settings" });
+  }
+});
+
 app.get("/api", (req, res) => {
   res.send("Server Started!");
+});
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
 
 module.exports = app;
