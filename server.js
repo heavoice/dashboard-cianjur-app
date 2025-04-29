@@ -3,6 +3,7 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const serverless = require("serverless-http");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
@@ -38,8 +39,5 @@ app.get("/api", (req, res) => {
   res.send("Server Started!");
 });
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
-
 module.exports = app;
+module.exports.handler = serverless(app);
