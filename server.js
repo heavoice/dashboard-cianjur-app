@@ -3,7 +3,6 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const serverless = require("serverless-http");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
@@ -23,9 +22,6 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api", authRoutes);
 app.use("/api", userRoutes);
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
 app.get("api/settings", async (req, res) => {
   try {
     const settings = await getSettings();
@@ -39,5 +35,8 @@ app.get("/api", (req, res) => {
   res.send("Server Started!");
 });
 
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
+
 module.exports = app;
-module.exports.handler = serverless(app);
