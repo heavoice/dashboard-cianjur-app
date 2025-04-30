@@ -20,8 +20,6 @@ initializeDatabase();
 
 app.use("/api", authRoutes);
 app.use("/api", userRoutes);
-app.use(express.static(path.join(__dirname, "public")));
-
 app.get("api/settings", async (req, res) => {
   try {
     const settings = await getSettings();
@@ -30,10 +28,10 @@ app.get("api/settings", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch settings" });
   }
 });
-
 app.get("/api", (req, res) => {
   res.send("Server Started!");
 });
+app.use(express.static(path.join(__dirname, "public")));
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
