@@ -18,9 +18,9 @@ app.use(express.json());
 
 initializeDatabase();
 
-app.use(express.static(path.join(__dirname, "public")));
 app.use("/api", authRoutes);
 app.use("/api", userRoutes);
+app.use(express.static(path.join(__dirname, "public")));
 
 app.get("api/settings", async (req, res) => {
   try {
