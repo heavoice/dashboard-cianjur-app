@@ -53,6 +53,8 @@ exports.login = async (req, res) => {
       expiresIn: "1h",
     });
 
+    console.log("Token :", token);
+
     res.json({
       message: "Login success",
       token,
