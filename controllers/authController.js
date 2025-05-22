@@ -4,7 +4,7 @@ const { pool } = require("../config/db");
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-exports.register = async (req, res) => {
+const register = async (req, res) => {
   const { fullname, email, password } = req.body;
 
   try {
@@ -24,14 +24,14 @@ exports.register = async (req, res) => {
       [fullname, email, hashedPassword]
     );
 
-    res.status(201).json({ message: "User dibuat", user: newUser.rows[0] });
+    res.status(201).json({ message: "User created", user: newUser.rows[0] });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-exports.login = async (req, res) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -53,7 +53,7 @@ exports.login = async (req, res) => {
       expiresIn: "1h",
     });
 
-    console.log("Token :", token);
+    console.log("Token:", token);
 
     res.json({
       message: "Login success",
@@ -70,7 +70,7 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.deleteUser = async (req, res) => {
+const deleteUser = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -90,7 +90,7 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-exports.getAllUsers = async (req, res) => {
+const getAllUsers = async (req, res) => {
   try {
     const result = await pool.query("SELECT full_name FROM users");
     res.status(200).json(result.rows);
@@ -98,4 +98,11 @@ exports.getAllUsers = async (req, res) => {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
+};
+
+module.exports = {
+  register,
+  login,
+  deleteUser,
+  getAllUsers,
 };
