@@ -6,7 +6,7 @@ const uploadDocumentation = async (req, res) => {
   try {
     const { kegiatan } = req.body;
     const file = req.file;
-
+    const subfolder = file.mimetype.startsWith("image") ? "images" : "videos";
     const existingDocs = await Documentation.findAll({
       order: [["uploadedAt", "ASC"]],
     });
@@ -22,7 +22,9 @@ const uploadDocumentation = async (req, res) => {
     const doc = await Documentation.create({
       activityName: kegiatan,
       fileUrl: file
-        ? `${req.protocol}://${req.get("host")}/uploads/${file.filename}`
+        ? `${req.protocol}://${req.get("host")}/uploads/${subfolder}/${
+            file.filename
+          }`
         : null,
 
       fileType: file
