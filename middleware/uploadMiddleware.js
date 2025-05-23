@@ -1,46 +1,41 @@
 const multer = require("multer");
-const path = require("path");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
+require("dotenv").config();
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    const isImage = [".png", ".jpg", ".jpeg"].includes(ext);
-    const isVideo = [".mp4", ".mov", ".avi", ".mkv"].includes(ext);
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-    if (isImage) {
-      cb(null, "public/uploads/images/");
-    } else if (isVideo) {
-      cb(null, "public/uploads/videos/");
-    } else {
-      cb(new Error("Only images and videos are allowed"), false);
-    }
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${file.originalname}`;
-    cb(null, uniqueName);
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
+    const isImage = file.mimetype.startsWith("image/");
+    const folder = isImage ? "documentation/images" : "documentation/videos";
+
+    return {
+      folder: folder,
+      allowed_formats: ["jpg", "png", "jpeg", "mp4", "mov", "avi", "mkv"],
+      public_id: `${Date.now()}-${file.originalname.split(".")[0]}`,
+    };
   },
 });
 
 const fileFilter = (req, file, cb) => {
-  const ext = path.extname(file.originalname).toLowerCase();
-  const allowedImageExt = [".png", ".jpg", ".jpeg"];
-  const allowedVideoExt = [".mp4", ".mov", ".avi", ".mkv"];
-
-  const allowedImageMimes = ["image/png", "image/jpg", "image/jpeg"];
-  const allowedVideoMimes = [
+  const allowedTypes = [
+    "image/png",
+    "image/jpeg",
+    "image/jpg",
     "video/mp4",
     "video/quicktime",
     "video/x-msvideo",
     "video/x-matroska",
   ];
-
-  if (
-    ![...allowedImageExt, ...allowedVideoExt].includes(ext) ||
-    ![...allowedImageMimes, ...allowedVideoMimes].includes(file.mimetype)
-  ) {
+  if (!allowedTypes.includes(file.mimetype)) {
     return cb(new Error("Only images and videos are allowed"), false);
   }
-
   cb(null, true);
 };
 
