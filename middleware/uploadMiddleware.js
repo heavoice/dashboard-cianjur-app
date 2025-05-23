@@ -2,9 +2,22 @@ const multer = require("multer");
 const path = require("path");
 
 const storage = multer.diskStorage({
-  destination: "/tmp",
+  destination: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const isImage = [".png", ".jpg", ".jpeg"].includes(ext);
+    const isVideo = [".mp4", ".mov", ".avi", ".mkv"].includes(ext);
+
+    if (isImage) {
+      cb(null, "public/uploads/images/");
+    } else if (isVideo) {
+      cb(null, "public/uploads/videos/");
+    } else {
+      cb(new Error("Only images and videos are allowed"), false);
+    }
+  },
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    cb(null, uniqueName);
   },
 });
 
