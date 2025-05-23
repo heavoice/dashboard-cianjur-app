@@ -1,41 +1,49 @@
 const { Documentation } = require("../models/Sequelize");
+const { createClient } = require("@supabase/supabase-js");
 const fs = require("fs");
 const path = require("path");
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 const uploadDocumentation = async (req, res) => {
   try {
     const { kegiatan } = req.body;
     const file = req.file;
-    const subfolder = file.mimetype.startsWith("image") ? "images" : "videos";
-    const existingDocs = await Documentation.findAll({
-      order: [["uploadedAt", "ASC"]],
-    });
 
-    if (existingDocs.length >= 3) {
-      const oldest = existingDocs[0];
-      if (oldest.fileUrl && fs.existsSync(oldest.fileUrl)) {
-        fs.unlinkSync(oldest.fileUrl);
-      }
-      await oldest.destroy();
-    }
+    if (!file) return res.status(400).json({ error: "No file uploaded" });
+
+    // Upload to Supabase Storage
+    const fileExt = path.extname(file.originalname);
+    const fileName = `${Date.now()}-${file.originalname}`;
+    const filePath = `uploads/${fileName}`;
+
+    const { data, error } = await supabase.storage
+      .from("documentation")
+      .upload(filePath, fs.createReadStream(file.path), {
+        contentType: file.mimetype,
+        upsert: true,
+      });
+
+    if (error) throw error;
+
+    const { data: publicUrlData } = supabase.storage
+      .from("documentation")
+      .getPublicUrl(filePath);
+
+    const fileType = file.mimetype.startsWith("image") ? "image" : "video";
 
     const doc = await Documentation.create({
       activityName: kegiatan,
-      fileUrl: file
-        ? `${req.protocol}://${req.get("host")}/uploads/${subfolder}/${
-            file.filename
-          }`
-        : null,
-
-      fileType: file
-        ? file.mimetype.startsWith("image")
-          ? "image"
-          : "video"
-        : null,
+      fileUrl: publicUrlData.publicUrl,
+      fileType,
     });
 
     res.status(201).json({ message: "Upload successful", data: doc });
   } catch (error) {
+    console.error("Upload error:", error.message);
     res.status(500).json({ error: error.message });
   }
 };
