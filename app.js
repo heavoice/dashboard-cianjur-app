@@ -9,6 +9,7 @@ const userRoutes = require("./routes/user");
 const visitorRoutes = require("./routes/visitor");
 const schoolRoutes = require("./routes/school");
 const documentationRoutes = require("./routes/documentation");
+const feedbackRoutes = require("./routes/feedback");
 
 const trackVisitor = require("./middleware/trackVisitor");
 const authenticateUser = require("./middleware/authMiddleware");
@@ -24,6 +25,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
 // Inisialisasi tabel Sequelize
@@ -41,6 +43,7 @@ app.use("/api", userRoutes);
 app.use("/api", visitorRoutes);
 app.use("/api", schoolRoutes);
 app.use("/api", documentationRoutes);
+app.use("/api", feedbackRoutes);
 
 // Health check
 app.get("/api", (req, res) => {
@@ -48,7 +51,6 @@ app.get("/api", (req, res) => {
 });
 
 // Serve static files
-app.use(express.static(path.join(__dirname, "public")));
 app.use(errorHandler);
 
 module.exports = app;

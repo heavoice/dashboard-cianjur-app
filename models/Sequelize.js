@@ -18,6 +18,7 @@ db.sequelize = sequelize;
 
 // Import and define the Documentation model
 db.Documentation = require("./Documentation")(sequelize, DataTypes);
+db.FeedbackForm = require("./FeedbackForm")(sequelize, DataTypes);
 
 sequelize
   .sync() // Syncing the models with the database

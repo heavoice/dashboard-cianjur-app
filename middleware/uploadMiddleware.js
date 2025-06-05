@@ -13,10 +13,12 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
     const isImage = file.mimetype.startsWith("image/");
+    const isVideo = file.mimetype.startsWith("video/");
     const folder = isImage ? "documentation/images" : "documentation/videos";
 
     return {
       folder: folder,
+      resource_type: "auto",
       allowed_formats: ["jpg", "png", "jpeg", "mp4", "mov", "avi", "mkv"],
       public_id: `${Date.now()}-${file.originalname.split(".")[0]}`,
     };
@@ -24,6 +26,7 @@ const storage = new CloudinaryStorage({
 });
 
 const fileFilter = (req, file, cb) => {
+  console.log("Uploaded file mimetype:", file.mimetype);
   const allowedTypes = [
     "image/png",
     "image/jpeg",
