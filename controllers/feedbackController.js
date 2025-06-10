@@ -2,17 +2,27 @@ const { FeedbackForm } = require("../models/Sequelize");
 
 const createFeedback = async (req, res) => {
   try {
-    const { nama, pesan, topik } = req.body;
+    const { nama, pesan, topik, kepuasan } = req.body;
 
     // Validasi sederhana (opsional)
-    if (!pesan || pesan.trim() === "") {
-      return res.status(400).json({ message: "Pesan tidak boleh kosong." });
+    if (
+      !pesan ||
+      pesan.trim() === "" ||
+      !topik ||
+      topik.trim() === "" ||
+      !kepuasan ||
+      kepuasan.trim() === ""
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Pesan, Topik, dan Kepuasan tidak boleh kosong." });
     }
 
     const feedback = await FeedbackForm.create({
       nama: nama || null,
       pesan,
       topik,
+      kepuasan,
     });
 
     return res.status(201).json({

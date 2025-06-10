@@ -46,7 +46,7 @@ app.use("/api", documentationRoutes);
 app.use("/api", feedbackRoutes);
 
 // Health check
-app.get("/api", (req, res) => {
+app.get("/", (req, res) => {
   res.send("Server Started!");
 });
 

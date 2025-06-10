@@ -10,7 +10,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     topik: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
+    },
+    kepuasan: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
   });
 
